@@ -9,5 +9,5 @@ int main(int argc, char *argv[])
 
     return a.exec();
 
-    // this is specially for qt commit
+    // s;dg;sf dhl
 }
