@@ -7,7 +7,5 @@ int main(int argc, char *argv[])
     GameWindow w;
     w.show();
 
-    // kdlf djgl
-
     return a.exec();
 }
