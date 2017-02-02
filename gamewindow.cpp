@@ -6,8 +6,8 @@ GameWindow::GameWindow(QWidget *parent) :
     ui(new Ui::GameWindow)
 {
     ui->setupUi(this);
-    this->resize(350, 450);       // sets the size of the window
-    this->setFixedSize(350, 450); // makes the window fixed
+    this->resize(350,450);       // sets the size of the window
+    this->setFixedSize(350,450); // makes the window fixed
 
     scene = new QGraphicsScene(); // inits graphics scene
     rect = new Rectangle();       // inits rectangle

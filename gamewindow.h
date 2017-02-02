@@ -20,8 +20,8 @@ public:
 
 private:
     Ui::GameWindow *ui;
-    QGraphicsScene *scene; // Defines scene
-    Rectangle      *rect;  // Defines rectangle
+    QGraphicsScene *scene;   // Defines scene
+    Rectangle redMass[17];   // Red line
 };
 
 #endif // GAMEWINDOW_H
