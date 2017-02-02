@@ -7,7 +7,5 @@ int main(int argc, char *argv[])
     GameWindow w;
     w.show();
 
-    // hjhghkl  hgk hbj
-
     return a.exec();
 }
