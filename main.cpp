@@ -7,7 +7,5 @@ int main(int argc, char *argv[])
     GameWindow w;
     w.show();
 
-    // kjlfs lj dflglj ldjldfj ljdhdl
-
     return a.exec();
 }
