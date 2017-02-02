@@ -2,6 +2,9 @@
 #define GAMEWINDOW_H
 
 #include <QMainWindow>
+#include <rectangle.h>
+#include <QWidget>
+#include <QGraphicsScene>
 
 namespace Ui {
 class GameWindow;
@@ -17,6 +20,8 @@ public:
 
 private:
     Ui::GameWindow *ui;
+    QGraphicsScene *scene; // Defines scene
+    Rectangle      *rect;  // Defines rectangle
 };
 
 #endif // GAMEWINDOW_H

@@ -24,8 +24,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        gamewindow.cpp
+        gamewindow.cpp \
+    rectange.cpp
 
-HEADERS  += gamewindow.h
+HEADERS  += gamewindow.h \
+    rectangle.h
 
 FORMS    += gamewindow.ui
