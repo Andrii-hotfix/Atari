@@ -2,9 +2,9 @@
 #define GAMEWINDOW_H
 
 #include <QMainWindow>
-#include <rectangle.h>
 #include <QWidget>
 #include <QGraphicsScene>
+#include <QGraphicsItem>
 
 namespace Ui {
 class GameWindow;
@@ -21,7 +21,7 @@ public:
 private:
     Ui::GameWindow *ui;
     QGraphicsScene *scene;   // Defines scene
-    Rectangle redMass[17];   // Red line
+    QGraphicsRectItem *brick;
 };
 
 #endif // GAMEWINDOW_H
