@@ -21,6 +21,7 @@ public:
 private:
     Ui::GameWindow *ui;
     QGraphicsScene *scene;         // Defines scene
+    QGraphicsScene *racquetArea;   // Horizontal area
     QGraphicsRectItem* bricks[44]; // Defines bricks
     QGraphicsRectItem* racquet;    // Defines racquet
     QGraphicsEllipseItem* ball;    // Defines ball

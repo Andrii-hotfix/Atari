@@ -1,4 +1,4 @@
-        #include "gamewindow.h"
+    #include "gamewindow.h"
     #include "ui_gamewindow.h"
     #include <QRectF>
     #include <QDebug>
@@ -47,6 +47,7 @@
 
         QBrush blackBrush(Qt::black);
         racquet = scene->addRect(150,350,50,10,blackPen,blackBrush);
+        ball = scene->addEllipse(170,340,10,10,blackPen,blackBrush);
     }
 
     GameWindow::~GameWindow()
