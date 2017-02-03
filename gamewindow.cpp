@@ -9,8 +9,8 @@ GameWindow::GameWindow(QWidget *parent) :
     ui(new Ui::GameWindow)
 {
     ui->setupUi(this);
-    this->resize(350,450);       // sets the size of the window
-    this->setFixedSize(350,450); // makes the window fixed
+    this->resize(370,480);       // sets the size of the window
+    this->setFixedSize(370,480); // makes the window fixed
 
     scene = new QGraphicsScene(); // inits graphics scene
 
@@ -19,17 +19,32 @@ GameWindow::GameWindow(QWidget *parent) :
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    QBrush redBrush(Qt::red);
-    QBrush yellowBrush(Qt::yellow);
-    QBrush blueBrush(Qt::blue);
-    QBrush greenBrush(Qt::green);
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
+    scene->setSceneRect(0,0,350,450);
 
-    scene->setSceneRect(0,0,350,450);                      // sets rectangle scene area
-    brick = scene->addRect(10,10,20,10,blackPen,redBrush); // sets the brick on the scene
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 11; j++) {
+            QColor color;
+            switch (i) {
+            case 0:
+                color = Qt::red;
+                break;
+            case 1:
+                color = Qt::yellow;
+                break;
+            case 2:
+                color = Qt::blue;
+                break;
+            case 3:
+                color = Qt::green;
+                break;
+            }
+            QBrush brush(color);
+            bricks[i*11+j] = scene->addRect(10+25*j+5*j,10+10*i+5*i,25,10,blackPen,brush);
+        }
+    }
 
-    qDebug() << brick->pos();
 
 }
 

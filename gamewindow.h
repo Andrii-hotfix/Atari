@@ -21,7 +21,7 @@ public:
 private:
     Ui::GameWindow *ui;
     QGraphicsScene *scene;   // Defines scene
-    QGraphicsRectItem *brick;
+    QGraphicsRectItem* bricks[44];
 };
 
 #endif // GAMEWINDOW_H
