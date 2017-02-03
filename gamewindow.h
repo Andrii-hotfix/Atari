@@ -20,8 +20,11 @@ public:
 
 private:
     Ui::GameWindow *ui;
-    QGraphicsScene *scene;   // Defines scene
-    QGraphicsRectItem* bricks[44];
+    QGraphicsScene *scene;         // Defines scene
+    QGraphicsRectItem* bricks[44]; // Defines bricks
+    QGraphicsRectItem* racquet;    // Defines racquet
+    QGraphicsEllipseItem* ball;    // Defines ball
+
 };
 
 #endif // GAMEWINDOW_H
