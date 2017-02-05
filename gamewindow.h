@@ -17,9 +17,14 @@ class GameGraphicsScene : public QGraphicsScene
 {
     Q_OBJECT
 
+private:
+    bool start;
+
 public:
     explicit GameGraphicsScene(QObject *parent = 0);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    bool started();
 
 signals:
     void newCursorX(int x);

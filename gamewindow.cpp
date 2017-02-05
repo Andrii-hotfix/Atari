@@ -45,15 +45,19 @@ GameWindow::GameWindow(QWidget *parent) :
     }
 
     QBrush blackBrush(Qt::black);
-    racquet = scene->addRect(150,350,50,10,blackPen,blackBrush);
-    ball = scene->addEllipse(170,340,10,10,blackPen,blackBrush);
+    racquet = scene->addRect(130,350,50,10,blackPen,blackBrush);
+    ball = scene->addEllipse(150,340,10,10,blackPen,blackBrush);
 
     QObject::connect(scene,SIGNAL(newCursorX(int)),this,SLOT(setRacquetX(int)));
 }
 
 void GameWindow::setRacquetX(int x)
 {
-    racquet->setX(x);
+    if (scene->started()) {
+        if (x < -151) racquet->setX(-151);
+        else if (x > 141) racquet->setX(141);
+        else racquet->setX(x);
+    }
 }
 
 GameWindow::~GameWindow()
@@ -62,10 +66,22 @@ GameWindow::~GameWindow()
 }
 
 GameGraphicsScene::GameGraphicsScene(QObject *parent)
-    : QGraphicsScene(parent) {}
+    : QGraphicsScene(parent)
+{
+    start = false;
+}
 
 void GameGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    emit newCursorX(event->scenePos().x()-175);
-//    qDebug() << event->scenePos().x();
+    emit newCursorX(event->scenePos().x()-155);
+}
+
+void GameGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (!start) start = true;
+}
+
+bool GameGraphicsScene::started()
+{
+    return start;
 }
