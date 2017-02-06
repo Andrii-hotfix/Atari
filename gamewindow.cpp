@@ -1,4 +1,4 @@
-#include "gamewindow.h"
+﻿#include "gamewindow.h"
 #include "ui_gamewindow.h"
 #include <QDebug>
 #include <ctime>
@@ -54,8 +54,7 @@ GameWindow::GameWindow(QWidget *parent) :
 
     connect(timer,SIGNAL(timeout()),scene,SLOT(advance()));
     connect(scene,SIGNAL(newCursorX(int)),this,SLOT(setRacquetX(int)));
-
-    timer->start(100);
+    connect(scene,SIGNAL(startMove()),this,SLOT(startMove()));
 }
 
 void GameWindow::setRacquetX(int x)
@@ -65,6 +64,11 @@ void GameWindow::setRacquetX(int x)
         else if (x > 141) racquet->setX(141);
         else racquet->setX(x);
     }
+}
+
+void GameWindow::startMove()
+{
+    timer->start(100);
 }
 
 GameWindow::~GameWindow()
@@ -99,7 +103,7 @@ bool GameGraphicsScene::started() const
 GameBall::GameBall()
     : QGraphicsItem()
 {
-    velocityX = 5;
+    velocityX = -5;
 
     setPos(mapToParent(150,340));
 }
@@ -133,18 +137,19 @@ void GameBall::advance(int phase)
     if (!phase) return;
 
     QPointF location = this->pos();
-    setPos(mapToParent(0,-velocityX));
+    setPos(mapToParent(0,velocityX));
 }
 
 void GameBall::DoCollision()
 {
-    QPointF newpoint = mapToParent(0, (this->pos().y()-5));
+//    QPointF newpoint = mapToParent(0, (this->pos().y()-10));
+    velocityX = -velocityX;
 
-    if (!scene()->sceneRect().contains(newpoint)) {
-        newpoint = mapToParent(150,340);
-    }
-    else {
-        setPos(newpoint);
-    }
+//    if (!scene()->sceneRect().contains(newpoint)) {
+//        newpoint = mapToParent(150,340);
+//    }
+//    else {
+//        setPos(newpoint);
+//    }
 }
 

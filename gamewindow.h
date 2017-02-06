@@ -59,6 +59,7 @@ public:
 
 public slots:
     void setRacquetX(int x);
+    void startMove();
 
 private:
     Ui::GameWindow *ui;
