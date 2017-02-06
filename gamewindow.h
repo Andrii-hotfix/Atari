@@ -2,16 +2,34 @@
 #define GAMEWINDOW_H
 
 #include <QMainWindow>
-#include <QWidget>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
-#include <QCursor>
+#include <QRectF>
+#include <QPainter>
+#include <QTimer>
 
 namespace Ui {
 class GameWindow;
 class GameGraphicsScene;
+class GameBall;
 }
+
+class GameBall : public QGraphicsItem
+{
+public:
+    GameBall();
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+protected:
+    void advance(int phase);
+
+private:
+    int velocityX;
+    void DoCollision();
+
+};
 
 class GameGraphicsScene : public QGraphicsScene
 {
@@ -24,12 +42,12 @@ public:
     explicit GameGraphicsScene(QObject *parent = 0);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    bool started();
+    bool started() const;
 
 signals:
     void newCursorX(int x);
+    void startMove();
 };
-
 
 class GameWindow : public QMainWindow
 {
@@ -47,7 +65,8 @@ private:
     GameGraphicsScene *scene;      // Defines scene
     QGraphicsRectItem *bricks[44]; // Defines bricks
     QGraphicsRectItem *racquet;    // Defines racquet
-    QGraphicsEllipseItem *ball;    // Defines ball
+    GameBall *ball;                // Defines ball
+    QTimer *timer;
 };
 
 #endif // GAMEWINDOW_H

@@ -1,6 +1,7 @@
 #include "gamewindow.h"
 #include "ui_gamewindow.h"
 #include <QDebug>
+#include <ctime>
 
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -45,10 +46,16 @@ GameWindow::GameWindow(QWidget *parent) :
     }
 
     QBrush blackBrush(Qt::black);
-    racquet = scene->addRect(130,350,50,10,blackPen,blackBrush);
-    ball = scene->addEllipse(150,340,10,10,blackPen,blackBrush);
+    racquet = scene->addRect(/*130*/170,350,50,10,blackPen,blackBrush);
+    ball = new GameBall();
+    scene->addItem(ball);
 
-    QObject::connect(scene,SIGNAL(newCursorX(int)),this,SLOT(setRacquetX(int)));
+    timer = new QTimer(this);
+
+    connect(timer,SIGNAL(timeout()),scene,SLOT(advance()));
+    connect(scene,SIGNAL(newCursorX(int)),this,SLOT(setRacquetX(int)));
+
+    timer->start(100);
 }
 
 void GameWindow::setRacquetX(int x)
@@ -78,10 +85,66 @@ void GameGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void GameGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!start) start = true;
+    if (!start) {
+        start = true;
+        emit startMove();
+    }
 }
 
-bool GameGraphicsScene::started()
+bool GameGraphicsScene::started() const
 {
     return start;
 }
+
+GameBall::GameBall()
+    : QGraphicsItem()
+{
+    velocityX = 5;
+
+    setPos(mapToParent(150,340));
+}
+
+QRectF GameBall::boundingRect() const
+{
+    return QRect(0,0,10,10);
+}
+
+void GameBall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    QRectF rec = boundingRect();
+    QBrush brush(Qt::black);
+
+    if (scene()->collidingItems(this).isEmpty()) {
+        // no collision
+        brush.setColor(Qt::green);
+    }
+    else {
+        // collision
+        brush.setColor(Qt::red);
+        DoCollision();
+    }
+
+    painter->setBrush(brush);
+    painter->drawEllipse(rec);
+}
+
+void GameBall::advance(int phase)
+{
+    if (!phase) return;
+
+    QPointF location = this->pos();
+    setPos(mapToParent(0,-velocityX));
+}
+
+void GameBall::DoCollision()
+{
+    QPointF newpoint = mapToParent(0, (this->pos().y()-5));
+
+    if (!scene()->sceneRect().contains(newpoint)) {
+        newpoint = mapToParent(150,340);
+    }
+    else {
+        setPos(newpoint);
+    }
+}
+
