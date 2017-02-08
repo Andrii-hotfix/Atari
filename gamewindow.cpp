@@ -46,7 +46,7 @@ GameWindow::GameWindow(QWidget *parent) :
     }
 
     QBrush blackBrush(Qt::black);
-    racquet = scene->addRect(/*130*/170,350,50,10,blackPen,blackBrush);
+    racquet = scene->addRect(130,350,50,2,blackPen,blackBrush);
     ball = new GameBall();
     scene->addItem(ball);
 
@@ -103,9 +103,9 @@ bool GameGraphicsScene::started() const
 GameBall::GameBall()
     : QGraphicsItem()
 {
-    velocityX = -5;
+    velocityX = 5;
 
-    setPos(mapToParent(150,340));
+    setPos(mapToParent(150,250));
 }
 
 QRectF GameBall::boundingRect() const
@@ -118,14 +118,17 @@ void GameBall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QRectF rec = boundingRect();
     QBrush brush(Qt::black);
 
-    if (scene()->collidingItems(this).isEmpty()) {
-        // no collision
-        brush.setColor(Qt::green);
-    }
-    else {
-        // collision
-        brush.setColor(Qt::red);
+    if (!scene()->collidingItems(this).isEmpty()) {
         DoCollision();
+        qDebug() << "now";
+        QList<QGraphicsItem*> collideList = scene()->collidingItems(this);
+        foreach(QGraphicsItem *i, collideList) {
+            QGraphicsRectItem *item = dynamic_cast<QGraphicsRectItem*>(i);
+            if (item != 0) {
+                qDebug() << "that's it";
+                scene()->removeItem(item);
+            }
+        }
     }
 
     painter->setBrush(brush);
@@ -136,20 +139,11 @@ void GameBall::advance(int phase)
 {
     if (!phase) return;
 
-    QPointF location = this->pos();
     setPos(mapToParent(0,velocityX));
 }
 
 void GameBall::DoCollision()
 {
-//    QPointF newpoint = mapToParent(0, (this->pos().y()-10));
     velocityX = -velocityX;
-
-//    if (!scene()->sceneRect().contains(newpoint)) {
-//        newpoint = mapToParent(150,340);
-//    }
-//    else {
-//        setPos(newpoint);
-//    }
 }
 

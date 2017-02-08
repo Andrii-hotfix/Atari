@@ -8,6 +8,7 @@
 #include <QRectF>
 #include <QPainter>
 #include <QTimer>
+#include <QPointF>
 
 namespace Ui {
 class GameWindow;
@@ -28,7 +29,6 @@ protected:
 private:
     int velocityX;
     void DoCollision();
-
 };
 
 class GameGraphicsScene : public QGraphicsScene
