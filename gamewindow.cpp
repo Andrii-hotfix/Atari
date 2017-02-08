@@ -1,7 +1,6 @@
 ﻿#include "gamewindow.h"
 #include "ui_gamewindow.h"
 #include <QDebug>
-#include <ctime>
 
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -46,11 +45,14 @@ GameWindow::GameWindow(QWidget *parent) :
     }
 
     QBrush blackBrush(Qt::black);
-    racquet = scene->addRect(130,350,50,2,blackPen,blackBrush);
+    racquet = scene->addRect(140,350,30,2,blackPen,blackBrush);
     ball = new GameBall();
     scene->addItem(ball);
 
     timer = new QTimer(this);
+
+    QTime midnight(0,0,0);
+    qsrand(midnight.secsTo(QTime::currentTime()));
 
     connect(timer,SIGNAL(timeout()),scene,SLOT(advance()));
     connect(scene,SIGNAL(newCursorX(int)),this,SLOT(setRacquetX(int)));
@@ -68,6 +70,9 @@ void GameWindow::setRacquetX(int x)
 
 void GameWindow::startMove()
 {
+    int x = qrand() % 16 - 8;
+    qDebug() << x;
+    ball->setVelocityX(x);
     timer->start(100);
 }
 
@@ -103,7 +108,8 @@ bool GameGraphicsScene::started() const
 GameBall::GameBall()
     : QGraphicsItem()
 {
-    velocityX = 5;
+    velocityY = 15;
+    int x = 0;
 
     setPos(mapToParent(150,250));
 }
@@ -119,14 +125,33 @@ void GameBall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QBrush brush(Qt::black);
 
     if (!scene()->collidingItems(this).isEmpty()) {
-        DoCollision();
-        qDebug() << "now";
+        velocityY = -velocityY;
         QList<QGraphicsItem*> collideList = scene()->collidingItems(this);
         foreach(QGraphicsItem *i, collideList) {
             QGraphicsRectItem *item = dynamic_cast<QGraphicsRectItem*>(i);
             if (item != 0) {
-                qDebug() << "that's it";
-                scene()->removeItem(item);
+                if (!(this->scenePos().y() > 335)) { // ball did not collide with racquet
+                    scene()->removeItem(item);
+                }
+            }
+        }
+    }
+    else {
+        if (this->scenePos().y() < 0) {
+            velocityY = -velocityY;
+        }
+        else if (this->scenePos().y() > 390) {
+            velocityY = -velocityY;
+            qDebug() << "-1";
+        }
+        else {
+            if (this->scenePos().x() < -22) {
+                velocityX = -velocityX;
+                this->setPos(-13, this->scenePos().y());
+            }
+            else if (this->scenePos().x() > 315) {
+                this->setPos(303, this->scenePos().y());
+                velocityX = -velocityX;
             }
         }
     }
@@ -135,15 +160,14 @@ void GameBall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->drawEllipse(rec);
 }
 
+void GameBall::setVelocityX(int velX)
+{
+    velocityX = velX;
+}
+
 void GameBall::advance(int phase)
 {
     if (!phase) return;
 
-    setPos(mapToParent(0,velocityX));
+    setPos(mapToParent(velocityX,velocityY));
 }
-
-void GameBall::DoCollision()
-{
-    velocityX = -velocityX;
-}
-

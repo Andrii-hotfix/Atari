@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QPointF>
+#include <QTime>
 
 namespace Ui {
 class GameWindow;
@@ -22,13 +23,14 @@ public:
     GameBall();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void setVelocityX(int velX);
 
 protected:
     void advance(int phase);
 
 private:
+    int velocityY;
     int velocityX;
-    void DoCollision();
 };
 
 class GameGraphicsScene : public QGraphicsScene
