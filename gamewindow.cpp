@@ -1,6 +1,7 @@
 ﻿#include "gamewindow.h"
 #include "ui_gamewindow.h"
 #include <QDebug>
+#include <QTextDocument>
 
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,6 +51,11 @@ GameWindow::GameWindow(QWidget *parent) :
     racquet = scene->addRect(140,350,30,2,blackPen,blackBrush);
     ball = new GameBall();
     scene->addItem(ball);
+    counter = new QGraphicsTextItem;
+    counter->setPos(117,150);
+    counter->setScale(5);
+    counter->setPlainText("0");
+    scene->addItem(counter);
 
     timer = new QTimer(this);
 
@@ -62,6 +68,8 @@ GameWindow::GameWindow(QWidget *parent) :
     connect(this,SIGNAL(updateLabel(QString)),ui->label,SLOT(setText(QString)));
     connect(ball,SIGNAL(liveLost()),this,SLOT(liveLost()));
     connect(this,SIGNAL(updateStart()),scene,SLOT(updateStart()));
+    connect(ball,SIGNAL(victory()),this,SLOT(vicrory()));
+    connect(ball,SIGNAL(updateCounter(uint)),this,SLOT(updateCounter(uint)));
 }
 
 void GameWindow::setRacquetX(int x)
@@ -79,14 +87,14 @@ void GameWindow::startMove()
     if (x == 0) x = 5;
     ball->setVelocityX(x);
     timer->start(100);
-    emit updateLabel("lives: " + QString::number(lives));
+    emit updateLabel("Lives: " + QString::number(lives));
 }
 
 void GameWindow::liveLost()
 {
     lives--;
     if (lives == 0) {
-        emit updateLabel("you lost");
+        emit updateLabel("You lost");
         this->close();
     }
     else {
@@ -94,8 +102,22 @@ void GameWindow::liveLost()
         ball->setPos(150,250);
         ball->setVelocityY(15);
         emit updateStart();
-        emit updateLabel("tap to start");
+        emit updateLabel("Tap to start");
     }
+}
+
+void GameWindow::vicrory()
+{
+    timer->stop();
+    emit updateLabel("You won this game! Congratulations from Andrii!)");
+}
+
+void GameWindow::updateCounter(unsigned int rBricks)
+{
+    if (rBricks == 10) {
+        counter->setPos(counter->scenePos().x()-22,counter->scenePos().y());
+    }
+    counter->setPlainText(QString::number(rBricks));
 }
 
 GameWindow::~GameWindow()
@@ -136,7 +158,7 @@ GameBall::GameBall()
     : QGraphicsItem()
 {
     velocityY = 15;
-
+    removedBricks = 0;
     setPos(mapToParent(150,250));
 }
 
@@ -151,13 +173,18 @@ void GameBall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QBrush brush(Qt::black);
 
     if (!scene()->collidingItems(this).isEmpty()) {
-        velocityY = -velocityY;
         QList<QGraphicsItem*> collideList = scene()->collidingItems(this);
         foreach(QGraphicsItem *i, collideList) {
             QGraphicsRectItem *item = dynamic_cast<QGraphicsRectItem*>(i);
             if (item != 0) {
+                velocityY = -velocityY;
                 if (!(this->scenePos().y() > 335)) { // ball did not collide with racquet
                     scene()->removeItem(item);
+                    removedBricks++;
+                    emit updateCounter(removedBricks);
+                    if (removedBricks == 44) {
+                        emit victory();
+                    }
                 }
                 else {
                     this->setPos(this->scenePos().x(),this->scenePos().y()-3);

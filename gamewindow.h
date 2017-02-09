@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
+#include <QGraphicsTextItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QRectF>
 #include <QPainter>
@@ -34,10 +35,13 @@ protected:
 
 signals:
     void liveLost();
+    void victory();
+    void updateCounter(unsigned int rBricks);
 
 private:
     int velocityY;
     int velocityX;
+    unsigned int removedBricks;
 };
 
 class GameGraphicsScene : public QGraphicsScene
@@ -73,6 +77,8 @@ public slots:
     void setRacquetX(int x);
     void startMove();
     void liveLost();
+    void vicrory();
+    void updateCounter(unsigned int rBricks);
 
 signals:
     void updateLabel(QString str);
@@ -84,6 +90,7 @@ private:
     GameGraphicsScene *scene;      // Defines scene
     QGraphicsRectItem *bricks[44]; // Defines bricks
     QGraphicsRectItem *racquet;    // Defines racquet
+    QGraphicsTextItem *counter;    // Defines counter
     GameBall *ball;                // Defines ball
     QTimer *timer;
     unsigned int lives;            // Defines lives
