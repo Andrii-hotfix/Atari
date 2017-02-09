@@ -10,6 +10,7 @@
 #include <QTimer>
 #include <QPointF>
 #include <QTime>
+#include <QString>
 
 namespace Ui {
 class GameWindow;
@@ -17,16 +18,22 @@ class GameGraphicsScene;
 class GameBall;
 }
 
-class GameBall : public QGraphicsItem
+class GameBall : public QObject, public QGraphicsItem
 {
+    Q_OBJECT
+
 public:
     GameBall();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void setVelocityX(int velX);
+    void setVelocityY(int velY);
 
 protected:
     void advance(int phase);
+
+signals:
+    void liveLost();
 
 private:
     int velocityY;
@@ -46,6 +53,9 @@ public:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     bool started() const;
 
+public slots:
+    void updateStart();
+
 signals:
     void newCursorX(int x);
     void startMove();
@@ -62,6 +72,12 @@ public:
 public slots:
     void setRacquetX(int x);
     void startMove();
+    void liveLost();
+
+signals:
+    void updateLabel(QString str);
+    void timerStop();
+    void updateStart();
 
 private:
     Ui::GameWindow *ui;
@@ -70,6 +86,7 @@ private:
     QGraphicsRectItem *racquet;    // Defines racquet
     GameBall *ball;                // Defines ball
     QTimer *timer;
+    unsigned int lives;            // Defines lives
 };
 
 #endif // GAMEWINDOW_H

@@ -18,6 +18,8 @@ GameWindow::GameWindow(QWidget *parent) :
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setMouseTracking(true);
 
+    lives = 3;
+
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
     scene->setSceneRect(0,0,300,400);
@@ -57,13 +59,16 @@ GameWindow::GameWindow(QWidget *parent) :
     connect(timer,SIGNAL(timeout()),scene,SLOT(advance()));
     connect(scene,SIGNAL(newCursorX(int)),this,SLOT(setRacquetX(int)));
     connect(scene,SIGNAL(startMove()),this,SLOT(startMove()));
+    connect(this,SIGNAL(updateLabel(QString)),ui->label,SLOT(setText(QString)));
+    connect(ball,SIGNAL(liveLost()),this,SLOT(liveLost()));
+    connect(this,SIGNAL(updateStart()),scene,SLOT(updateStart()));
 }
 
 void GameWindow::setRacquetX(int x)
 {
     if (scene->started()) {
-        if (x < -151) racquet->setX(-151);
-        else if (x > 141) racquet->setX(141);
+        if (x < -161) racquet->setX(-161);
+        else if (x > 151) racquet->setX(151);
         else racquet->setX(x);
     }
 }
@@ -71,9 +76,26 @@ void GameWindow::setRacquetX(int x)
 void GameWindow::startMove()
 {
     int x = qrand() % 16 - 8;
-    qDebug() << x;
+    if (x == 0) x = 5;
     ball->setVelocityX(x);
     timer->start(100);
+    emit updateLabel("lives: " + QString::number(lives));
+}
+
+void GameWindow::liveLost()
+{
+    lives--;
+    if (lives == 0) {
+        emit updateLabel("you lost");
+        this->close();
+    }
+    else {
+        timer->stop();
+        ball->setPos(150,250);
+        ball->setVelocityY(15);
+        emit updateStart();
+        emit updateLabel("tap to start");
+    }
 }
 
 GameWindow::~GameWindow()
@@ -105,11 +127,15 @@ bool GameGraphicsScene::started() const
     return start;
 }
 
+void GameGraphicsScene::updateStart()
+{
+    start = !start;
+}
+
 GameBall::GameBall()
     : QGraphicsItem()
 {
     velocityY = 15;
-    int x = 0;
 
     setPos(mapToParent(150,250));
 }
@@ -133,6 +159,9 @@ void GameBall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
                 if (!(this->scenePos().y() > 335)) { // ball did not collide with racquet
                     scene()->removeItem(item);
                 }
+                else {
+                    this->setPos(this->scenePos().x(),this->scenePos().y()-3);
+                }
             }
         }
     }
@@ -140,9 +169,9 @@ void GameBall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         if (this->scenePos().y() < 0) {
             velocityY = -velocityY;
         }
-        else if (this->scenePos().y() > 390) {
+        else if (this->scenePos().y() > 370) {
             velocityY = -velocityY;
-            qDebug() << "-1";
+            emit liveLost();
         }
         else {
             if (this->scenePos().x() < -22) {
@@ -163,6 +192,11 @@ void GameBall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 void GameBall::setVelocityX(int velX)
 {
     velocityX = velX;
+}
+
+void GameBall::setVelocityY(int velY)
+{
+    velocityY = velY;
 }
 
 void GameBall::advance(int phase)
