@@ -1,7 +1,5 @@
 ﻿#include "gamewindow.h"
 #include "ui_gamewindow.h"
-#include <QDebug>
-#include <QTextDocument>
 
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -70,6 +68,7 @@ GameWindow::GameWindow(QWidget *parent) :
     connect(this,SIGNAL(updateStart()),scene,SLOT(updateStart()));
     connect(ball,SIGNAL(victory()),this,SLOT(vicrory()));
     connect(ball,SIGNAL(updateCounter(uint)),this,SLOT(updateCounter(uint)));
+    connect(scene,SIGNAL(gameOver()),this,SLOT(gameOver()));
 }
 
 void GameWindow::setRacquetX(int x)
@@ -94,8 +93,9 @@ void GameWindow::liveLost()
 {
     lives--;
     if (lives == 0) {
-        emit updateLabel("You lost");
-        this->close();
+        emit updateLabel("You lost (tap to close)");
+        scene->setLastTape(true);
+        timer->stop();
     }
     else {
         timer->stop();
@@ -109,7 +109,8 @@ void GameWindow::liveLost()
 void GameWindow::vicrory()
 {
     timer->stop();
-    emit updateLabel("You won this game! Congratulations from Andrii!)");
+    scene->setLastTape(true);
+    emit updateLabel("You won this game! (tap to close)");
 }
 
 void GameWindow::updateCounter(unsigned int rBricks)
@@ -118,6 +119,11 @@ void GameWindow::updateCounter(unsigned int rBricks)
         counter->setPos(counter->scenePos().x()-22,counter->scenePos().y());
     }
     counter->setPlainText(QString::number(rBricks));
+}
+
+void GameWindow::gameOver()
+{
+    close();
 }
 
 GameWindow::~GameWindow()
@@ -129,6 +135,7 @@ GameGraphicsScene::GameGraphicsScene(QObject *parent)
     : QGraphicsScene(parent)
 {
     start = false;
+    lastTape = false;
 }
 
 void GameGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -142,11 +149,21 @@ void GameGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         start = true;
         emit startMove();
     }
+    else {
+        if (lastTape) {
+            emit gameOver();
+        }
+    }
 }
 
 bool GameGraphicsScene::started() const
 {
     return start;
+}
+
+void GameGraphicsScene::setLastTape(bool flag)
+{
+    lastTape = flag;
 }
 
 void GameGraphicsScene::updateStart()

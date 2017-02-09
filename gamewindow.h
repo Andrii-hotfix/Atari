@@ -50,12 +50,14 @@ class GameGraphicsScene : public QGraphicsScene
 
 private:
     bool start;
+    bool lastTape;
 
 public:
     explicit GameGraphicsScene(QObject *parent = 0);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     bool started() const;
+    void setLastTape(bool flag);
 
 public slots:
     void updateStart();
@@ -63,6 +65,7 @@ public slots:
 signals:
     void newCursorX(int x);
     void startMove();
+    void gameOver();
 };
 
 class GameWindow : public QMainWindow
@@ -79,6 +82,7 @@ public slots:
     void liveLost();
     void vicrory();
     void updateCounter(unsigned int rBricks);
+    void gameOver();
 
 signals:
     void updateLabel(QString str);
